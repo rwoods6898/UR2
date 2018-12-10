@@ -91,6 +91,7 @@ namespace Shapes
             {
                 serialMonitoringThread.Abort();
             }
+
         }
 
         private void capture_Click(object sender, EventArgs e) //Capture background and display 

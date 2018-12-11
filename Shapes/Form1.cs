@@ -37,6 +37,7 @@ namespace Shapes
         private int baudRate = 9600;
         private int cameraNumber = 0;
         private Mat background;
+        private double oldX = 0, oldY = 0, Force = 0;
 
         public Form1()  //Startp everything 
         {
@@ -248,7 +249,21 @@ namespace Shapes
             else
             {
                 //Transform to polar coordinates
-                yCoord = 210 - yCoord;
+                yCoord = 210 - yCoord;            
+                
+                //If repeat coordinates, increase the steps to try and grab the shape
+                if (xCoord < oldX + 10 && xCoord > oldX - 10)
+                    if (yCoord < oldY + 10 && yCoord > oldY - 10)
+                        if (Force < 3)
+                            Force++;
+                        else { }
+                    else { }
+                else
+                {
+                    Force = 0;
+                    oldX = xCoord;
+                    oldY = yCoord;
+                }
 
                 radius = xCoord;
                 xCoord = xCoord + 258.82;
@@ -257,17 +272,19 @@ namespace Shapes
                 angle = yCoord / xCoord;
                 angle = Math.Atan(angle);
                 angle = angle * (180 / Math.PI);
+                angle = angle + (5 * Force);
 
                 xCoord = radius;
 
                 radius = Math.Sqrt((xCoord * xCoord) + (yCoord * yCoord));
             }
-            
+
 
             xCoord = Math.Round(xCoord, 2);
             yCoord = Math.Round(yCoord, 2);
             radius = Math.Round(radius, 2);
             angle = Math.Round(angle, 2);
+
 
             //Print out Coordinates
             Invoke(new Action(() =>

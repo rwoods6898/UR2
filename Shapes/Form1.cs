@@ -29,6 +29,7 @@ namespace Shapes
         SerialPort arduinoSerial = new SerialPort();
         bool enableCoordinateSending = true;
         Thread serialMonitoringThread;
+        Thread shapeThread;
 
         //Variables
         private bool serial = true;
@@ -87,6 +88,7 @@ namespace Shapes
         private void Form1_FormClosing(object sender, FormClosingEventArgs e) //Stop everything 
         {
             _captureThread.Abort();
+            shapeThread.Abort();
             if (serial == true)
             {
                 serialMonitoringThread.Abort();
@@ -107,10 +109,20 @@ namespace Shapes
 
         private void shape_Click(object sender, EventArgs e) //Starts the loop of finding and moving shapes
         {
+            shapeThread = new Thread(Looper);
+            shapeThread.Start();
+        }
+
+        private void Looper() //Keeps finding shpaes
+        {
+            while (true)
+            {
                 if (enableCoordinateSending == true)
                 {
                     FindShapes();
+                    while (enableCoordinateSending) {   }
                 }
+            }
         }
 
         private bool FindShapes()  //Captures current camera frame, and finds shapes, returns false when no shapes are present, otherwise returns true 
@@ -301,8 +313,12 @@ namespace Shapes
                 }
                 if (msg.Substring(0, 1) == "S")
                 {
-                    // command is to suspend, toggle states accordingly:
-                    ToggleFieldAvailability(msg.Substring(1, 1) == "1");
+                    //Command is to suspend, toggle states accordingly:
+                    //ToggleFieldAvailability(msg.Substring(1, 1) == "1");
+                    if (msg == "S1")
+                        enableCoordinateSending = flase;
+                    else
+                        enableCoordinateSending = true;
                 }
             }
         }
